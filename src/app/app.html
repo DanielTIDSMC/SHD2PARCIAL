@@ -1,0 +1,33 @@
+﻿<header class="topbar">
+  <strong>Mi PWA</strong>
+  <nav style="display: flex; gap: 15px;">
+    <a routerLink="/products" routerLinkActive="active" style="color: white; text-decoration: none;">Productos</a>
+    <a routerLink="/users" routerLinkActive="active" style="color: white; text-decoration: none;">Usuarios</a>
+    <a routerLink="/posts" routerLinkActive="active" style="color: white; text-decoration: none;">Publicaciones</a>
+  </nav>
+</header>
+
+<main class="shell">
+  <div class="notification-bar">
+    <button class="subscription-button" [class.subscribed]="realtime.enabled()" type="button" (click)="toggleRealtimeNotices()">
+      <span aria-hidden="true">{{ realtime.enabled() ? '✓' : '🔔' }}</span>
+      {{ realtime.enabled() ? 'Avisos dentro de la app activados' : 'Activar avisos dentro de la app' }}
+    </button>
+    @if (push.isSupported) {
+      <button class="push-subscription-button" [class.push-enabled]="push.enabled()" type="button" (click)="togglePushSubscription()">
+        {{ push.enabled() ? 'Cancelar suscripción push' : 'Suscribirme a notificaciones push' }}
+      </button>
+    }
+    @if (push.lastResult()) { <span class="notification-status" role="status">{{ push.lastResult() }}</span> }
+  </div>
+  @if (inAppNotice.notice(); as notice) {
+    <aside class="app-toast" role="status" aria-live="polite">
+      <span class="toast-mark" aria-hidden="true">✓</span>
+      <span class="toast-copy"><strong>{{ notice.title }}</strong><small>{{ notice.message }}</small></span>
+      <button class="toast-close" type="button" aria-label="Cerrar aviso" (click)="inAppNotice.dismiss()">×</button>
+    </aside>
+  }
+  <!-- Â¡IMPORTANTE! Este es el que renderiza los Productos y Usuarios -->
+  <router-outlet />
+  
+</main>

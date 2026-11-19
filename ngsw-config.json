@@ -1,0 +1,74 @@
+
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "dataGroups": [
+    {
+      "name": "api-products",
+      "urls": [
+        "https://dummyjson.com/products",
+        "https://dummyjson.com/products/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "timeout": "10s",
+        "maxAge": "1m",
+        "maxSize": 3
+      }
+    },
+    {
+      "name": "imagenes-products",
+      "urls": ["https://cdn.dummyjson.com/**"],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxAge": "30d",
+        "maxSize": 60,
+        "cacheOpaqueResponses": true
+      }
+    },
+    {
+      "name": "api-users",
+      "urls": ["https://dummyjson.com/users", "https://dummyjson.com/users/**"],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "timeout": "10s",
+        "maxAge": "2d",
+        "maxSize": 20
+      }
+    },
+    {
+      "name": "jsonplaceholder-posts",
+      "urls": ["https://jsonplaceholder.typicode.com/posts", "https://jsonplaceholder.typicode.com/posts/**"],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "timeout": "5s",
+        "maxAge": "7d",
+        "maxSize": 100
+      }
+    }
+  ],
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.csr.html",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"]
+      }
+    }
+  ]
+}

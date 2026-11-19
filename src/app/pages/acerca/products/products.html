@@ -1,0 +1,94 @@
+<section class="catalog">
+  <header class="catalog-head">
+    <div>
+      <h1>Productos</h1>
+      <p>Catálogo disponible incluso sin conexión.</p>
+      <!-- Reto 2: Mostrar fecha -->
+      <small style="color: #0f4c81; font-weight: bold;">Última sincronización con internet: {{ service.ultimaActualizacion() }}</small>
+    </div>
+    
+    <div class="head-actions">
+      <!-- Reto 1: Selector de categorías -->
+      <select (change)="onCategoryChange($event)" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;">
+        <option value="all">Todas las categorías</option>
+        @for (cat of service.categories(); track cat) {
+          <option [value]="cat">{{ cat | titlecase }}</option>
+        }
+      </select>
+      <button type="button" (click)="reload()">Recargar</button>
+      <button type="button" class="primary" (click)="openCreate()">Nuevo producto</button>
+    </div>
+  </header>
+
+  @if (formError) { <p class="form-error" role="alert">{{ formError }}</p> }
+
+  @if (service.loading()) {
+    <p class="state">Cargando productos...</p>
+  }
+
+  @if (service.error()) {
+    <div class="state error">
+      <p>{{ service.error() }}</p>
+      <button type="button" (click)="reload()">Reintentar</button>
+    </div>
+  }
+
+  <div class="grid">
+    @for (product of service.products(); track product.id) {
+      <article class="card">
+        <img [src]="product.image" [alt]="product.title" />
+        <span class="category">{{ product.category }}</span>
+        <h2>{{ product.title }}</h2>
+        <p class="price">{{ product.price | currency: 'USD' }}</p>
+        <div class="card-actions">
+          <button type="button" class="secondary" (click)="selectedProduct = selectedProduct?.id === product.id ? null : product">{{ selectedProduct?.id === product.id ? 'Ocultar' : 'Ver detalle' }}</button>
+          <button type="button" class="secondary" (click)="openEdit(product)">Editar</button>
+          <button type="button" class="danger" (click)="deleteProduct(product)">Eliminar</button>
+        </div>
+        @if (selectedProduct?.id === product.id) { <p class="description">{{ product.description }}</p> }
+      </article>
+    } @empty {
+      @if (!service.loading() && !service.error()) {
+        <p class="state">No hay productos en esta categoría.</p>
+      }
+    }
+  </div>
+
+  @if (formOpen) {
+    <div class="overlay" (click)="closeForm()">
+      <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="form-title" (click)="$event.stopPropagation()">
+        <header class="dialog-head">
+          <h2 id="form-title">{{ editingId === null ? 'Nuevo producto' : 'Editar producto' }}</h2>
+          <button type="button" class="close" aria-label="Cerrar" (click)="closeForm()">×</button>
+        </header>
+        <form #productForm="ngForm" (ngSubmit)="saveProduct()">
+          <label>Nombre<input name="title" [(ngModel)]="draft.title" required maxlength="120" /></label>
+          <div class="form-row">
+            <label>Precio (USD)<input name="price" type="number" [(ngModel)]="draft.price" min="0.01" step="0.01" required /></label>
+            <label>Categoría<input name="category" [(ngModel)]="draft.category" required maxlength="60" /></label>
+          </div>
+          <label>URL de imagen<input name="image" type="url" [(ngModel)]="draft.image" required /></label>
+          <label>Descripción<textarea name="description" [(ngModel)]="draft.description" required rows="4"></textarea></label>
+          @if (formError) { <p class="form-error" role="alert">{{ formError }}</p> }
+          <footer class="dialog-actions">
+            <button type="button" class="secondary" (click)="closeForm()">Cancelar</button>
+            <button type="submit" class="primary" [disabled]="productForm.invalid || saving">{{ saving ? 'Guardando…' : 'Guardar' }}</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+  @if (productPendingDelete; as product) {
+    <div class="overlay confirm-overlay" (click)="cancelDelete()">
+      <section class="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description" (click)="$event.stopPropagation()">
+        <div class="confirm-icon" aria-hidden="true">!</div>
+        <h2 id="delete-title">¿Eliminar producto?</h2>
+        <p id="delete-description">Se eliminará <strong>{{ product.title }}</strong> del catálogo de esta aplicación.</p>
+        <footer class="confirm-actions">
+          <button type="button" class="secondary" (click)="cancelDelete()">Conservar producto</button>
+          <button type="button" class="danger confirm-delete" (click)="confirmDelete()">Sí, eliminar</button>
+        </footer>
+      </section>
+    </div>
+  }
+</section>

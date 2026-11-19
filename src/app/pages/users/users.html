@@ -1,0 +1,70 @@
+<section class="catalog">
+  <header class="catalog-head">
+    <div>
+      <h1>Usuarios</h1>
+      <p>Administra las cuentas de usuario.</p>
+    </div>
+    <button type="button" class="primary" (click)="openCreate()">Nuevo usuario</button>
+  </header>
+
+  @if (notice(); as message) {
+    <div class="toast" [class.toast-error]="message.type === 'error'" role="status" aria-live="polite">{{ message.text }}</div>
+  }
+
+  @if (service.loading()) {
+    <p class="state">Cargando usuarios...</p>
+  }
+
+  @if (service.error()) {
+    <p class="state error">{{ service.error() }}</p>
+  }
+
+  <div class="grid">
+    @for (user of service.users(); track user.id) {
+      <article class="card">
+        <h2>{{ user.name.firstname }} {{ user.name.lastname }}</h2>
+        <p class="category">{{ user.email }}</p>
+        <p class="price">@{{ user.username }}</p>
+        <div class="card-actions">
+          <button type="button" class="secondary" (click)="showDetails(user)">Detalle</button>
+          <button type="button" class="secondary" (click)="openEdit(user)">Editar</button>
+          <button type="button" class="danger" (click)="deleteUser(user)">Eliminar</button>
+        </div>
+        @if (selectedUser?.id === user.id) {
+          <div class="details">
+            <p><strong>Nombre:</strong> {{ user.name.firstname }} {{ user.name.lastname }}</p>
+            <p><strong>Correo:</strong> {{ user.email }}</p><p><strong>Usuario:</strong> @{{ user.username }}</p>
+            <p><strong>Teléfono:</strong> {{ user.phone }}</p>
+            <p><strong>Dirección:</strong> {{ user.address.street }} {{ user.address.number }}, {{ user.address.city }}, {{ user.address.zipcode }}</p>
+            <p><strong>Coordenadas:</strong> {{ user.address.geolocation.lat }}, {{ user.address.geolocation.long }}</p>
+            <p><strong>ID:</strong> {{ user.id }}</p>
+          </div>
+        }
+      </article>
+    } @empty {
+      @if (!service.loading() && !service.error()) {
+        <p class="state">No hay usuarios.</p>
+      }
+    }
+  </div>
+
+  @if (formOpen) {
+    <div class="overlay" (click)="closeForm()">
+      <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="user-form-title" (click)="$event.stopPropagation()">
+        <header class="dialog-head"><h2 id="user-form-title">{{ editingId === null ? 'Nuevo usuario' : 'Editar usuario' }}</h2><button type="button" class="close" aria-label="Cerrar" (click)="closeForm()">×</button></header>
+        <form #userForm="ngForm" (ngSubmit)="saveUser()">
+          <label>Nombre<input name="firstname" [(ngModel)]="draft.name.firstname" required maxlength="60" /></label>
+          <label>Apellido<input name="lastname" [(ngModel)]="draft.name.lastname" required maxlength="60" /></label>
+          <label>Correo electrónico<input name="email" type="email" [(ngModel)]="draft.email" required email /></label>
+          <label>Nombre de usuario<input name="username" [(ngModel)]="draft.username" required minlength="3" maxlength="30" /></label>
+          <label>Contraseña<input name="password" type="password" [(ngModel)]="draft.password" required minlength="6" /></label>
+          <div class="form-row"><label>Teléfono<input name="phone" type="tel" [(ngModel)]="draft.phone" required /></label><label>Ciudad<input name="city" [(ngModel)]="draft.address.city" required /></label></div>
+          <div class="form-row"><label>Calle<input name="street" [(ngModel)]="draft.address.street" required /></label><label>Número<input name="number" type="number" [(ngModel)]="draft.address.number" min="1" required /></label></div>
+          <label>Código postal<input name="zipcode" [(ngModel)]="draft.address.zipcode" required /></label>
+          <div class="form-row"><label>Latitud<input name="lat" [(ngModel)]="draft.address.geolocation.lat" required /></label><label>Longitud<input name="long" [(ngModel)]="draft.address.geolocation.long" required /></label></div>
+          <footer class="dialog-actions"><button type="button" class="secondary" (click)="closeForm()">Cancelar</button><button type="submit" class="primary" [disabled]="userForm.invalid || saving">{{ saving ? 'Guardando…' : 'Guardar usuario' }}</button></footer>
+        </form>
+      </section>
+    </div>
+  }
+</section>
