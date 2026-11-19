@@ -11,7 +11,11 @@ const port = Number(process.env.PORT || process.env.REALTIME_PORT || 3001);
 if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
   throw new Error('Missing VAPID keys. Copy the provided .env.example to .env and set the keys.');
 }
-webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:admin@example.com', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+const configuredSubject = (process.env.VAPID_SUBJECT || 'mailto:admin@example.com').trim();
+const vapidSubject = configuredSubject.includes('@') && !configuredSubject.startsWith('mailto:')
+  ? `mailto:${configuredSubject}`
+  : configuredSubject;
+webpush.setVapidDetails(vapidSubject, process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
 const server = createServer((req, res) => {
   const origin = req.headers.origin || '*';
