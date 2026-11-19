@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:realtime": "node --env-file=.env server/realtime-server.mjs",
+    "start:realtime": "node server/realtime-server.mjs",
+    "start:realtime:local": "node --env-file=.env server/realtime-server.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

@@ -2,7 +2,7 @@
 
 ## Local
 
-1. En la raíz del proyecto, ejecuta `npm.cmd run start:realtime` para iniciar el servidor de avisos y push.
+1. En la raíz del proyecto, ejecuta `npm.cmd run start:realtime:local` para iniciar el servidor de avisos y push con las claves de `.env`.
 2. En otra terminal, ejecuta `npm.cmd run build` y después `npx.cmd http-server .\dist\pwa\browser -p 8080`.
 3. Abre `http://localhost:8080`. Para avisos entre sesiones, abre la dirección en dos pestañas. Para push, usa el botón de suscripción y acepta el permiso del navegador.
 
